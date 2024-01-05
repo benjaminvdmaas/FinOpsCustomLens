@@ -13,4 +13,6 @@ There are four pillars (or groups of questions) that you go through in the asses
 - Operational Management (How do you organize your finops efforts, how much is it a part of your organization)
 
 ## Note:
-I created this a while back, so I am sure it can be improved upon. I was limited by the structure of how AWS ingests the JSON. For example, the logic generating High, medium or No risk is very simplistic (though not necessarily wrong). The more things you check off your list as things that you already have covered for a question or topic, the less risk is assigned to that topic.
+I created this a while back, so I am sure it can be improved upon. I was limited by the structure of how AWS ingests the JSON. For example, the logic generating High, medium or No risk is very simplistic (though not necessarily wrong). The more things you check off your list as things that you already have covered for a question or topic, the less risk is assigned to that topic. 
+
+Hope this little project helps people, feel free to fork and add your own tweaks!
