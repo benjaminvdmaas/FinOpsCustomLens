@@ -1,0 +1,1843 @@
+{
+  "schemaVersion": "2021-11-01",
+  "name": "FinOps Custom Lens",
+  "description": "A Review of your designated workload on your FinOps posture, providing you with direct action points.",
+  "pillars": [
+    {
+      "id": "finops_oa",
+      "name": "Ownership & Awareness",
+      "questions": [
+        {
+          "id": "finops_oa_q1",
+          "title": "Do you employ an AWS account strategy?",
+          "description": "A lot of the billing and cost control is done on an AWS account level, therefore having a good AWS Account strategy is very important.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Deploying new accounts happens in an automated way.",
+              "helpfulResource": {
+                "displayText": "By automating the deployment process of AWS accounts, you make sure that the necessary tooling and configuration are rolled out from the start and the necessary parties are alerted when a new account is made. Things such as budget alerts, third-party cost tooling agents, tagging policies, security standards, access controls and more all rely on automation in the deployment process.",
+                "url": "https://aws.amazon.com/solutions/implementations/automated-account-configuration/"
+              },
+              "improvementPlan": {
+                "displayText": "Start by creating a playbook for account creation, then investigate automating that process. Having a playbook first ensures that you can also perform the actions manually should the automation fail. It also serves as documentation for your pipeline."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Existing accounts are all under the AWS Organization.",
+              "helpfulResource": {
+                "displayText": "If accounts fall outside of the AWS organization, not only are they billed separately and might not meet your organization's billing and payment terms, but they also don't share in possible organization-wide rate optimization plans.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enroll-account.html"
+              },
+              "improvementPlan": {
+                "displayText": "Work with the teams using independent AWS accounts to join the AWS Organization."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "AWS Landing Zone or AWS Control Tower to manage the accounts on an organizational level.",
+                "helpfulResource": {
+                  "displayText": "To govern at scale, you will need an entity that can orchestrate and direct organization-wide standards and enforce things like tagging policies, service control policies, guardrails and more.",
+                  "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-migration/aws-landing-zone.html"
+                },
+                "improvementPlan": {
+                  "displayText": "Deploy AWS Control Tower and onboard the existing AWS accounts to have tools to govern at an overarching level."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "There is clear ownership of each AWS Account.",
+                "helpfulResource": {
+                  "displayText": "Ownership drives accountability and discipline, so each account in your AWS environment should have a clear owner. This can be a product owner if the account houses an application, a team lead if the account is a team sandbox and so on.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work on building an internal list for all AWS accounts within your organization, so that there is a clear single point of contact for topics about each AWS account."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "AWS Account ownership is documented and kept up-to-date.",
+                "helpfulResource": {
+                  "displayText": "It is not enough to have a spoken agreement on who owns which account, but it needs to be documented and maintained in the organization's CMDB or Knowledge Management System.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "If you feel like your organization has an idea of who owns what, write it down and share it within your IT organization. Work on indicating an owner for maintaining that list."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don't yet have an account strategy, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "The goal is to have full control over the lifecycle of your AWS accounts. Start by identifying the owners of the existing accounts and maintaining that list. Then work on implementing AWS Control Tower and onboarding the existing account. Finally, draw up your account deployment process and automate it."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+            "id": "finops_oa_q2",
+            "title": "Do you employ and enforce a tagging strategy?",
+            "description": "While cost allocation is natively done on an account level in AWS, tagging allows us to add granularity and customise the way we analyze cost.",
+            "choices": [
+              {
+                "id": "choice1",
+                "title": "A tagging policy or naming convention has been agreed upon by the stakeholders.",
+                "helpfulResource": {
+                  "displayText": "The first part in having an effective tagging strategy is having a tagging policy or naming convention agreed upon by the stakeholders. By using the same tag semantics across the organization, you greatly improve the efficiency of your cost analysis and cost ownership.",
+                  "url": "https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html"
+                },
+                "improvementPlan": {
+                  "displayText": "Start by creating an inventory of the current tags in use by the teams and see if there are options there to consolidate existing tag practices. Then assign someone to draft a tag policy and improve on that with the teams building and working in AWS to create a first tag policy version."
+                }
+              },
+              {
+                "id": "choice2",
+                "title": "The tagging policy is enforced automatically through governance measures in AWS.",
+                "helpfulResource": {
+                  "displayText": "The tagging policy itself is great to prescribe the standards, automating enforcing it is crucial to make it work.",
+                  "url": "https://aws.amazon.com/blogs/mt/implement-aws-resource-tagging-strategy-using-aws-tag-policies-and-service-control-policies-scps/"
+                },
+                "improvementPlan": {
+                  "displayText": "Through a combination of AWS Organizations, Guardrails and Service Control Policies, you can create an appropriate automated tag policy and roll that out across your member accounts.",
+                  "url": "https://aws.amazon.com/blogs/mt/implement-aws-resource-tagging-strategy-using-aws-tag-policies-and-service-control-policies-scps/"
+                }
+              },
+              {
+                  "id": "choice3",
+                  "title": "There is a process in place to monitor for and alert on non-compliant resources.",
+                  "helpfulResource": {
+                    "displayText": "This reactive, periodically occurring mechanism can be manual or automated. It ensures the Tagging Strategy is followed and governed.",
+                    "url": "https://docs.aws.amazon.com/ARG/latest/userguide/tag-policies-orgs-evaluating-org-wide-compliance.html"
+                  },
+                  "improvementPlan": {
+                    "displayText": "AWS allows you to monitor tag compliance, but you can also leverage third-party tools to really dig into your tagging posture. See if you have existing third-party tooling available that can cover this need before you start building it yourself."
+                  }
+                },
+                {
+                  "id": "choice4",
+                  "title": "Non-compliant resources are actively brought in compliance or are terminated.",
+                  "helpfulResource": {
+                    "displayText": "While automating this can be a challenge, it is important to actively work on bringing untagged and non-compliant tags in line with the policy.",
+                    "url": "https://docs.aws.amazon.com/"
+                  },
+                  "improvementPlan": {
+                    "displayText": "Design a playbook that draws up how you remediate tag non-compliance. After that, you can automate this process. AWS Tag Editor can be helpful here.",
+                    "url": "https://docs.aws.amazon.com/ARG/latest/userguide/tagging-resources.html"
+                  }
+                },
+                {
+                  "id": "choice5",
+                  "title": "Tags related to cost have been activated as AWS Cost Allocation Tags.",
+                  "helpfulResource": {
+                    "displayText": "Cost Allocation Tags are tags that you define, create, and apply to resources. After activating these they can be used in the Billing and Cost Management console for cost allocation tracking.",
+                    "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/custom-tags.html"
+                  },
+                  "improvementPlan": {
+                    "displayText": "If your organization does not use cost allocation tags, you should catalog what tags are in place and what should be used and activated as cost allocation tags. Make sure these are in place and can be leveraged to report on costs."
+                  }
+                },
+                {
+                  "id": "choice6",
+                  "title": "None of the above apply to us.",
+                  "helpfulResource": {
+                    "displayText": "If you don't yet have a tagging strategy, select this option.",
+                    "url": "https://docs.aws.amazon.com/"
+                  },
+                  "improvementPlan": {
+                    "displayText": "The goal is to have a view of the tagging strategy and control the utilization of that strategy. Work on building a clear list of the tags in use and where and in which format they should be used. Then work on implementing and enforcing the tag policy automatically. Finally, monitor and alert on tag compliance and activation of certain tags as cost allocation tags."
+                  }
+                }
+            ],
+            "riskRules": [
+              { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+              { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+              { "condition": "default", "risk": "HIGH_RISK" }
+            ]
+        },
+        {
+            "id": "finops_oa_q3",
+            "title": "Do you have a mechanism in place to report on cloud cost and usage?",
+            "description": "Reporting is crucial to gain and maintain situational awareness and drive your decisions and actions in relation to business value.",
+            "choices": [
+              {
+                "id": "choice1",
+                "title": "Finance, Technology and Business Stakeholders have access to AWS Cost and Usage Data.",
+                "helpfulResource": {
+                  "displayText": "While it is not enough to just have access to your cost and usage data, it is a great start for all stakeholders to know what is going on. A view of the cost and usage data should be available to all involved stakeholders at all times.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Real-time insight into your cloud costs are crucial and can be considered job zero. This is where third-party tooling can shine, as they provide dashboarding and customization options out of the box. Work with your AWS Reseller to see what is available to you. If you want to use AWS Native Tooling, you can build your own Cost Intelligence Dashboard.",
+                  "url":"https://aws.amazon.com/blogs/aws-cloud-financial-management/a-detailed-overview-of-the-cost-intelligence-dashboard/"
+                }
+              },
+              {
+                "id": "choice2",
+                "title": "Stakeholders can customize the dashboarding and cost views to suit their needs.",
+                "helpfulResource": {
+                  "displayText": "Not everyone needs to see the same information at all times. Because of this, stakeholders might need to build and maintain their dashboard to quickly see the information relevant to them.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Custom dashboards might be available to you via third-party tooling, or can be built using AWS Native Tooling. Try implementing something like an AWS Well-Architected Cost Visualization Lab to using Amazon Quicksight to get started.",
+                  "url": "https://www.wellarchitectedlabs.com/cost/200_labs/200_5_cost_visualization/"
+                }
+              },
+              {
+                  "id": "choice3",
+                  "title": "Reporting granularity is of a sufficient level.",
+                  "helpfulResource": {
+                    "displayText": "Granularity is important to gain relevant insights into your cloud costs. Third-party tooling can help you gain insights into your costs quickly thanks to features like standard reports, advanced grouping, etc. The same insights can also be gained by using AWS cost-explorer but more upfront work is needed.",
+                    "url": "https://docs.aws.amazon.com/"
+                  },
+                  "improvementPlan": {
+                    "displayText": "If you have third-party tooling, work on building pre-made filters for your stakeholders to use and document the existing levels of granularity so that they make sense and can be used. If you are using AWS Native Tooling, look into ensuring your tagging strategy is enforced and maintained."
+                  }
+                },
+                {
+                  "id": "choice4",
+                  "title": "Reports are automatically and periodically pushed.",
+                  "helpfulResource": {
+                    "displayText": "Experience teaches us that having the data available to you does not mean it is frequently consulted. Because of this, it is important to automate a periodic report push to your stakeholders.",
+                    "url": "https://docs.aws.amazon.com/"
+                  },
+                  "improvementPlan": {
+                    "displayText": "Look at this in your third-party tooling of choice and work with your reseller for support if needed. If you are using AWS Native Tooling, you can build automated Athena Queries of your CUR file and automate the delivery process with Lambda and SES.",
+                    "url": "https://www.wellarchitectedlabs.com/cost/300_labs/300_automated_cur_query_and_email_delivery/"
+                  }
+                },
+                {
+                  "id": "choice5",
+                  "title": "Reporting is timed with your organization's financial cycle.",
+                  "helpfulResource": {
+                    "displayText": "Your finance department might need the data in a specific format at different time periods, so make sure your FinOps reporting is aligned with your finance and budget cycles.",
+                    "url": "https://www.finops.org/framework/capabilities/chargeback/"
+                  },
+                  "improvementPlan": {
+                    "displayText": "Sit together with your finance department and work with them to see what information they need, in what frequency they need them and in what format. Use your existing periodic report delivery to automate this."
+                  }
+                },
+                {
+                  "id": "choice6",
+                  "title": "None of the above apply to us.",
+                  "helpfulResource": {
+                    "displayText": "If you don't yet have a reporting strategy, select this option.",
+                    "url": "https://docs.aws.amazon.com/"
+                  },
+                  "improvementPlan": {
+                    "displayText": "The goal is to have reporting help you gain awareness in near real-time of your environment and cost evolution. Knowing what happens and having information available when you need it is crucial to keeping your cloud spending in control."
+                  }
+                }
+            ],
+            "riskRules": [
+              { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+              { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+              { "condition": "default", "risk": "HIGH_RISK" }
+            ]
+        },
+        {
+          "id": "finops_oa_q4",
+          "title": "Do you have a mechanism in place to monitor and alert on cloud cost and usage?", 
+          "description": "As cloud cost is driven by time consumed, in the CAPEX model, it is important to monitor what is going on and take action swiftly and decisively.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "AWS Cloud costs are proactively monitored by using AWS Native Tools or third-party tooling.",
+              "helpfulResource": {
+                "displayText": "As most cloud costs charges are incurred on an hourly basis, having an idea of what is going on and how your costs are evolving in real-time is essential to staying to op things. Monitoring your costs should be as natural as monitoring the health of your production systems.",
+                "url":"https://wa.aws.amazon.com/wat.question.COST_3.en.html "
+              },
+              "improvementPlan": {
+                "displayText": "Look into deploying cost monitoring solutions in your architecture. You essentially have the option to build things yourself or use third-party tooling that comes with a lot of monitoring, alerting and analytics tooling out of the box. Third-party tooling allows you to quickly get a grip on larger environments and standardize your process organization-wide, while building it yourself can serve any specific requirements your organization might have.",
+                "url":"https://wellarchitectedlabs.com/cost/200_labs/200_5_cost_visualization/"
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Alerting is used to maintain awareness of possible cost anomalies and alerts are sent to the right people.",
+              "helpfulResource": {
+                "displayText": "Just having a monitor in place is not enough. Since costs in the cloud are charged in very small timeframes, you also have a rather limited amount of time to respond to possible anomalous charges or deploys causing you to burn money. Having a good system of cost alerts in place is important to get value out of the monitoring you have in place.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Set up billing and budget alerts for your AWS workloads that reflect the desired and undesired spending of a workload. For this you can usually use third-party tooling pretty easily, so if you have that available, look there first. If you don’t have any tooling in place, look to build your own in AWS.",
+                "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html"
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Cost & Usage monitoring is part of the new workload launch checklist.",
+                "helpfulResource": {
+                  "displayText": "Deploying new workloads in the cloud should go hand in hand with deploying the right monitoring. When deploying cloudwatch agents or other monitoring solutions, make sure they include the cost monitors",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Update your launch runbook to include cost monitoring tooling. If you have no cost monitoring tooling available, work on building it or acquiring third-party tooling."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "A pipeline exists to treat cost alerts and use the information for effective, remediation.",
+                "helpfulResource": {
+                  "displayText": "An alert itself is not enough. A pipeline needs to be in place to get the alerts to whoever needs to treat them, negate false positives and document the ticket response.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Document how a process needs to go and how it can be automated. Think of it as a service plan, that should be updated and reviewed periodically."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Anomaly responses are documented and lessons learned are maintained.",
+                "helpfulResource": {
+                  "displayText": "Usually we see this in the ticketing or ITIL system. In Jira, ServiceNow or other systems you can easily follow up on responses to generated tickets. Regular retrospectives are important to then also draw lessons out of the tickets.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Cost anomalies ideally go straight into your ticketing systems. Using Amazon SNS you can easily link up your resources with ticketing tools. Third-party tooling often makes this possible as well."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us",
+                "helpfulResource": {
+                  "displayText": "If you don't yet have a montioring and alerting strategy, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "The goal is to have monitoring and alerting in place to help you keep eyes on what is going on and respond swiftly. Knowing what happens and having information available when you need it is crucial to keeping your cloud spend under control."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+        "id": "finops_oa_q5",
+        "title": "Do you have a mechanism in place to determine Cloud Resource Efficiency?", 
+        "description": "Resource Efficiency ensures that you only pay for what you need by avoiding over-provisioning. Measuring the utilization rates of your resources is essential for making cost-effective decisions.",
+        "choices": [
+          {
+            "id": "choice1",
+            "title": "AWS Resource efficiency is measured, calculated and reported on an ongoing basis.",
+            "helpfulResource": {
+              "displayText": "The problem with a lot of applications deployed to the cloud is that they require you to provision for peak use. In order to put cost in relation to use, you need to monitor what the effective use of your resources is and have that information available.",
+              "url": "https://docs.aws.amazon.com/"
+            },
+            "improvementPlan": {
+              "displayText": "Work on getting a dashboard up and running that show your resource usage levels to you. That way you can see where you need to optimize your resource efficiency.",
+              "url":"https://www.wellarchitectedlabs.com/performance-efficiency/100_labs/100_monitoring_with_cloudwatch_dashboards/"
+            }
+          },
+          {
+            "id": "choice2",
+            "title": "Resource efficiency metrics are used to make cost management decisions.",
+            "helpfulResource": {
+              "displayText": "The key here is that the resource efficiency drives the cost decisions. Too often we see dependencies on applications, that require the architecture to be scaled for maximum use and results in low resource efficiency.",
+              "url": "https://docs.aws.amazon.com/"
+            },
+            "improvementPlan": {
+              "displayText": "Review the application that is running on low efficient resources and consider replacing it with more cloud-friendly solutions or maybe even off-the-shelf SaaS."
+            }
+          },
+          {
+              "id": "choice3",
+              "title": "A process is in place to automatically treat idle and unused resources.",
+              "helpfulResource": {
+                "displayText": "In many organizations people periodically look into idle or unused resources, but the produced list is not always converted into action. Automating this process makes it more likely money does not go to waste.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work with internal or external engineers to automate a search-and-destroy for unused resources in non-production environments. For Idle resources, see if you can create a process that gives a clear set of steps to get from discovery to action.",
+                "url": "https://aws.amazon.com/blogs/architecture/optimize-cost-by-automating-the-start-stop-of-resources-in-non-production-environments/"
+              }
+            },
+            {
+              "id": "choice4",
+              "title": "Resource Efficiency is an important factor in deciding to implement reserved capacity.",
+              "helpfulResource": {
+                "displayText": "It can be bad enough that an EC2 Instance or another cloud resource only runs on let’s say 20% of its capacity, but it would be even worse if you purchase a reserved instance based on that instance. Making sure your resources are optimized before they are committed to, is crucial in doing proper resource optimization.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Make sure your resource optimization targets are defined and planned and try to do rate optimization or resource capacity in an incremental way. Purchase a baseline savings plan and finetune with individual savings plans or reserved instances."
+                
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "Inefficient resources that remain have a documented decision log, available in the Knowledge Management System.",
+              "helpfulResource": {
+                "displayText": "Not every decision is remembered as easily. It can be valid that a resource remains running at a lower efficiency rate. To avoid discussion about this, it is important that all such decisions are logged and the decision log is available.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Find a place where you will store the decision log and what the decision logs need to contain (reasoning, remediation plan, revision timeline, etc.). See if any of the current architectural decisions warrant a decision log showing why you keep them running despite a low resource efficiency level."
+              }
+            },
+            {
+              "id": "choice6",
+              "title": "None of the above apply to us",
+              "helpfulResource": {
+                "displayText": "If you don't yet have a resource efficiency strategy, select this option.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "The goal with resource efficiency is to put the cost of a solution, the business value it brings and the technical set-up together to see if you get the business value you need for the lowest cost available. Resource efficiency is the identifying factor for targets that should be in scope of your technical infrastructure optimization and strategic rate optimization."
+              }
+            }
+        ],
+        "riskRules": [
+          { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+          { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+          { "condition": "default", "risk": "HIGH_RISK" }
+        ]
+        },
+        {
+        "id": "finops_oa_q6",
+        "title": "Do you measure and track business unit cloud cost efficiency?", 
+        "description": "Cloud costs are decision driven, so having a view of the Cloud Financial Management posture on a business unit level is important to make sure that your cloud costs are optimized consistently.",
+        "choices": [
+          {
+            "id": "choice1",
+            "title": "Business Unit cost efficiency is measured, calculated and reported on an ongoing basis.",
+            "helpfulResource": {
+              "displayText": "Within organizations, we often see cloud cost being driven on a team or business unit level. Because of this it is important to measure the cost-efficient resource usage on the unit level that drives the cost.",
+              "url":"https://cloudfix.com/blog/amazon-2-pizza-teams/"
+            },
+            "improvementPlan": {
+              "displayText": "Cost is driven on a decision basis, so identify the units that can make cost-driving decisions independently. Then work with them to schedule cost efficiency reporting."
+            }
+          },
+          {
+            "id": "choice2",
+            "title": "Business Unit KPIs include cost efficiency and budget optimization KPIs to measure the cost management posture.",
+            "helpfulResource": {
+              "displayText": "By setting a goal for each unit active in the cloud to keep their cloud cost efficiency under control, you instill a culture of ownership over the financial side of the cloud. This plays heavily into the FinOps principle of ownership.",
+              "url": "https://docs.aws.amazon.com/"
+            },
+            "improvementPlan": {
+              "displayText": "Work with the business units active in the cloud to set up KPIs that help them project a desirable cloud cost footprint and work towards them.",
+              "url": "https://www.finops.org/framework/capabilities/decision-accountability-structure"
+            }
+          },
+          {
+              "id": "choice3",
+              "title": "Business Unit Cost efficiency is reviewed and tracked periodically.",
+              "helpfulResource": {
+                "displayText": "A large part of the showback model is periodic reviews with the units driving and organizing cloud costs. Awareness and accountability drive ownership.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Set up monthly or quarterly review sessions with the unit leads, product owners or system owners that run workloads in AWS to review the cost.",
+                "url": "https://aws.amazon.com/blogs/architecture/optimize-cost-by-automating-the-start-stop-of-resources-in-non-production-environments/"
+              }
+            },
+            {
+              "id": "choice4",
+              "title": "Within a Business Unit, a cost optimization methodology is documented and available.",
+              "helpfulResource": {
+                "displayText": "Each team has a different structure and different people available to work on cost efficiency. Documenting strategy within a team makes sure that ownership stays where it is supposed to be.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work with the members of each team or business unit to document best practices relevant to their activities."
+                
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "The Business Unit documents and shares lessons learned about cloud financial management relevant to them.",
+              "helpfulResource": {
+                "displayText": "It is common to make mistakes, especially with complex cloud environments. Since small mistakes can incur big costs, it is crucial to document the lessons learned and have a clear agreed space where people can find the information they need.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work with the people in charge of your in-house Knowledge Management System or CMDB to have a space available for cost-related lessons learned. Maybe organize brown bags around common topics such as the use of spot instances, autoscaling and lambda compute resources for your team."
+              }
+            },
+            {
+              "id": "choice6",
+              "title": "None of the above apply to us",
+              "helpfulResource": {
+                "displayText": "If you don't yet have a way of working in place for your cost-driving business units, select this option.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Core to cloud financial management is ownership, as it is each person that can cause costs to rise out of control. See how your organization can help the business units own their activities and related costs in the cloud."
+              }
+            }
+        ],
+        "riskRules": [
+          { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+          { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+          { "condition": "default", "risk": "HIGH_RISK" }
+        ]
+        }
+      ]
+    },
+    {
+      "id": "finops_co",
+      "name": "Cost Optimization",
+      "questions": [
+        {
+          "id": "finops_co_q1",
+          "title": "Do you take cost optimization into account during new workload design and architecture phases?",
+          "description": "Any workload being built to land in the AWS cloud environment should adhere to the pillars of the well-architected framework as much as possible. One of the pillars is cost optimization, which requires you to make sure that your new workload is cost-efficient.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Cloud cost is a deciding factor of equal importance similar to compliance, performance, security and other requirements.",
+              "helpfulResource": {
+                "displayText": "A lot of solutions are evaluated on their compliance and security posture when designed and deployed, influencing the decisions made on how to do things. Cloud cost is not always taken into account in a similar way, but this should definitely be the case.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "When reviewing a solution design for a new or existing AWS workload, review the costs and document how it influences your action points. Create and grow a set of checks for this for the team reviewing the solution.",
+                "url": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/evaluate-cost-when-selecting-services.html"
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Assessment of AWS building blocks evaluates AWS managed services vs. self-managed AWS components.",
+              "helpfulResource": {
+                "displayText": "Services managed by AWS such as RDS and AWS Opensearch are good to help you maintain your infrastructure components. When building a workload, you should compare the price of the AWS-managed solution with building it yourself and maintaining it yourself.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "If you have no clear idea of the costs of maintaining your infrastructure (patching, backup, …) you can have no idea of the total cost of your application. Work on further maturing the picture you have of your solution cost."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Possible further cost optimization options drive you to make specific architectural decisions.",
+                "helpfulResource": {
+                  "displayText": "Not all services allow for fine-tuning and optimizing your costs as well as others. When you design your new AWS workload, try to look for services that can be further optimized down the road. (Think of services like S3 for Intelligent Tiering, services that are compatible with compute savings plans…)",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Document what services are available for further cost optimization and work on making these available in your company’s Knowledge Management System or CMDB. Providing information for the design phase is crucial in making sure your cost stays manageable down the road."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Projects are required to deliver a recurring cost estimation at design delivery.",
+                "helpfulResource": {
+                  "displayText": "Understanding how your workload, application or project incurs costs after launch is crucial. When delivering a project, the team working on delivery should write out how they expect the cost to grow.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "As a standard issue in every sprint, have the team detail how the recurring cost of the solution will look and how they expect it to respond to changes in usage. Have the written documentation of this in place as a mandatory deliverable."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Development and test environments have automated waste elimination in place.",
+                "helpfulResource": {
+                  "displayText": "A lot of developers like to build by trial and error and that level of flexibility is one of the strong sides of the cloud. It’s easy to forget you are trying out a service however and leave it on to incur costs.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Third-Party tooling is really useful for identifying idle resources. Focus on the development and non-production accounts first. Work with an engineering service provider to develop automated scripts as a next step after creating an identification process. Some opensource solutions are available at GitHub, but involve your security and compliance colleagues when testing those."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don't yet have cost optimization as a deciding factor in your build & design process, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "While a lot of Cloud Financial Management is reactive in practice, building for cost-optimized workloads and future cost optimization is equally important."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q2",
+          "title": "Is there a mechanism in place to perform solution or workload-based cloud cost reviews?",
+          "description": "At the core of managing cloud costs, it is important to constantly review if you are meeting your efficiency goals. Having a process in place to standardize this process goes a long way in making sure you don’t waste money in the cloud.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Cloud Cost optimization opportunities are identified based on regular manual analysis of AWS-based workloads.",
+              "helpfulResource": {
+                "displayText": "Situational awareness can be gained via monitoring and alerting, but reviewing and challenging existing workloads should be part of the day-to-day operations for your Cloud Financial Management team or partner.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "When everyone is responsible, usually no one is. Someone should have time allocated to review the cost data and do analysis to identify next steps. Work on identifying your Cloud Financial Analyst or look for an external partner that can bring experience to the table."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Tooling is in place to support cost optimization reviews.",
+              "helpfulResource": {
+                "displayText": "Having the right tools available to do analysis and reviews is job zero. AWS allows you to build your own thing, or you can work with an external party or third-party tooling. Examples of tooling are AWS Compute Optimizer, CloudCheckr, and CloudHealt, etc.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Identify a resource that can allocate time in developing tooling. The first step is to identify a tooling strategy, do you want to build it yourself (and maintain it) or work with a third-party tool? Then work on deploying the strategy."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Cost optimization reviews follow a documented process. Procedures are kept in the organization's Knowledge Management System.",
+                "helpfulResource": {
+                  "displayText": "As the saying goes, there’s a relation between insanity and doing the same thing over and over again. Doing the same thing over and over again, and figuring out how to do it each time all anew is even worse. When doing reviews, document your process, standardize it and improve it.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "If you already have someone in place doing reviews regularly, have them document their process and make it available to the right stakeholders and the Knowledge Management System/CMDB of your organization."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Identified opportunities are prioritized, planned and implemented in a systematic and effective manner.",
+                "helpfulResource": {
+                  "displayText": "There should be space in sprints or workload capacity planning to add to optimization efforts. When reviews or alerts show FinOps Findings, you need to be able to plan them and tackle them.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "When making your sprint planning or program increment planning, leave room for a certain amount of structural improvement tickets. Improving existing workloads should also be a KPI."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "A decision log is kept when cost optimization actions are taken.",
+                "helpfulResource": {
+                  "displayText": "Often when things are changed or decisions are made, the reasoning behind these decisions gets lost in time.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Create an available template for logging decisions and have a clear place to deposit them. Make it known that they are stored there and ensure the stakeholders know where to find them."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don’t have a clear strategy for cost evaluation of existing workloads, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Cloud Financial Management is something that is never finished, constantly reviewing what is running and striving to optimize things is a core responsibility for FinOps professionals."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q3",
+          "title": "Do you utilize rate optimization opportunities to lower the cost of your cloud infrastructure?",
+          "description": "While people like to say that the cloud is a pay for what you use model, it would be more accurate to say 'pay for what you provision'. Cloud Financial management not only helps you to provide only what you need, but also to lower the price of the things you spin up.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Savings Plans are used to cover your organization's compute spend at an accurate spend commitment.",
+              "helpfulResource": {
+                "displayText": "AWS Savings Plans provide you with a discounted rate for a certain dollars/hour commitment in specific AWS services. Running a compute savings plan distributed across your AWS organization is usually a no-brainer to get you started in saving money.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work with a Cloud Financial Management Analyst or Engineer to design and calculate savings plans that work with your cloud and business strategy. Usually the savings gained that way make this a zero-sum operation."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Reserved Instances or specific Savings Plans are used to fine-tune and further specify the rate optimization.",
+              "helpfulResource": {
+                "displayText": "Not everything can be covered in one savings plan on an organizational level. This is why you should try to be modular about your rate optimization and use reserved instances or specific savings plans to further fine-tune your strategy.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "A Cloud Financial Management Analyst can help you work out a strategy for this, but it is also important that you first have an idea of the commitment appetite for the workloads you run in the cloud. What does your commitment horizon look like? Are there already architectural changes in view?"
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Commitment purchases are reviewed and adjusted periodically.",
+                "helpfulResource": {
+                  "displayText": "Using commitments like savings plans and reserved instances to optimize your rate is good but requires monitoring and adjustments down the line.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "When you have reserved capacity in place, make savings showback and review part of your overall showback strategy and dedicate regular time to reviewing the rate optimization."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Existing Savings Plans are taken into account when building new workloads in AWS.",
+                "helpfulResource": {
+                  "displayText": "This is mainly about savings plans that apply to existing workloads. Say your organization has a Compute Savings Plan on the organizational level, then if you look at deploying containers you will want to take Fargate into consideration.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "See what Savings Plans are in place and make sure that that information is available to solution architects and developers in your different teams."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "A process is in place to perform a showback on the savings gained from resource commitment discounts.",
+                "helpfulResource": {
+                  "displayText": "Not only is it important to showback of the savings achieved, but it is also important to know how the savings are being distributed. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Document the savings showback strategy and the savings distribution strategy. A Cloud Financial Management Analyst can help you here."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don’t have a clear strategy for rate optimization of existing workloads, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "While you should always work on optimizing the infrastructure you use to keep the costs low, lowering the price you pay for the infrastructure is essential as well. Work on implementing and designing a rate optimization strategy. For this, work together with an experienced Cloud Financial Management Analyst."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q4",
+          "title": "Do you utilize cloud elasticity to minimize the cloud cost at rest of your application?",
+          "description": "Typical to cloud-based workloads is the elasticity (scaling up, scaling down, turning off and turning on of resources). Using elasticity in your solution and the available economic instance types goes a long way to keeping your cloud cost low.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "EC2 Spot Instances are considered when building or designing new workloads for development, test and production scenarios.",
+              "helpfulResource": {
+                "displayText": "Not all workloads are suited for EC2 Spot Type instances, but since it is by far the cheapest compute option out there, it is something that should be seriously weighed in the design and decision process.",
+                "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html"
+              },
+              "improvementPlan": {
+                "displayText": "Make sure that spot instances are understood and considered. Get engineers familiar with possible use cases for your business type. See if existing workloads can be re-engineered to do auto-scaling with spot instances."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Elasticity as a principle is used in all environments to keep the baseline provisioned resources at a minimum.",
+              "helpfulResource": {
+                "displayText": "Elasticity is one of the basic principles of using the cloud, but more often than not applications and workloads are built on a static size. This limits the cost optimization options significantly. You will always have some capacity running that is not matching the demand.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work on redesigning static, vertically scaling environments to horizontally scaling, preferably auto-scaling architectures. Start by identifying targets, prioritizing those and estimating the feasibility of investing in their rebuild."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Environments that are conducive to being turned off are shut off outside of business hours, during weekends or holidays.",
+                "helpfulResource": {
+                  "displayText": "One of the first rules of the cloud is to only run what you need, when you need it. If you do not need your infrastructure to run (at the same size) 24/7, there is no need to run it and incur costs that much.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "For each workload running in the cloud, determine when it needs to be running. When this is listed up, prioritize the list based on desirability, business criticality, and effort. Then move to plan the remediation efforts."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Sandboxes and temporary environments are automatically scheduled/scaled down based on agreed-upon parameters.",
+                "helpfulResource": {
+                  "displayText": "It is good to give engineers the opportunity to try out certain things in a sandbox environment. However, it should be automated to clean up what is in them, so costs don’t unnecessarily keep being incurred.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Set up an automatic clean-up of the entire account on a monthly basis, so that each month has a clean sheet. Any workloads that need to remain can perhaps be left based on tagging."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "The use of container-based architecture is the norm in our organization.",
+                "helpfulResource": {
+                  "displayText": "Container-based architecture allows for costs to be incurred in direct relation to the demand of the end-users. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Identify workloads running on static compute environments, and order them based on cost. Then investigate if they can be deployed in scaling groups and work on planning the remediation efforts."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don’t yet implement cloud infrastructure elasticity as a principle in your organization, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Building your application following elasticity and the other principles of the AWS Well-Architected Framework should be the first thing you do in terms of optimizing for cost efficiency. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q5",
+          "title": "Is there a policy in place to standardize, implement and monitor the rightsizing of cloud resources?",
+          "description": "With AWS Services, you can usually scale up or scale down your compute resources based on your needs. The more accurate usage data you gather from your environment, the better you can rightsize your architecture and resources to fit the need.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "The process to rightsize various types of compute resources is documented and reviewed regularly.",
+              "helpfulResource": {
+                "displayText": "Rightsizing requires the right people in charge of doing an assessment as well as the right people available to sign off on the rebuilding efforts. ", 
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Draw up the steps you want your engineers or teams to take and set up regular retrospectives to see if your process is sufficient to identify and remediate un-rightsized resources."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Tooling is available to capture usage data and support rightsizing efforts.",
+              "helpfulResource": {
+                "displayText": "Monitoring should be in place for every IT solution in your environment. It should monitor things such as CPU, memory and uptime to give you a clear idea of the health and capacity of your resources.",
+                "url": "https://acloudguru.com/hands-on-labs/using-cloudwatch-dashboards-to-monitor-resource-utilization"
+              },
+              "improvementPlan": {
+                "displayText": "While you can use third-party tooling for this, you can build a lot of what you need with cloudwatch and visualize it in the AWS Console that way. See what monitoring solution your organization has in place and if it provides you with the information you need. Then build from there."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "There are clear lines of ownership for in-scope cloud resources and there is an established decision strategy available.",
+                "helpfulResource": {
+                  "displayText": "One of the most common issues with rightsizing efforts is that the decisions to take action do not get made. By identifying ownership and having a clear line of decisions, you map out all possible steps needed to take action.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work on identifying owners for the different workloads you run on AWS and document ownership in your company's CMDB or Knowledge Management System. Then, if you use an ITIL tool such as Jira or ServiceNow, implement automatic decision-making prompts in your tooling."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Rightsizing opportunities are reviewed periodically and brought up to the relevant stakeholders with a regular cadence.",
+                "helpfulResource": {
+                  "displayText": "Rightsizing is not something you should do once or twice. As the cloud is constantly evolving and growing, you should work to have rightsizing to keep up with the constant growth. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work to establish monthly or quarterly review sessions of the rightsizing of your environments and instill it as part of your continuous improvement culture."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Efficient resource usage is part of the KPIs when evolving a product team.",
+                "helpfulResource": {
+                  "displayText": "If it is not a target that holds merit in your team’s evaluation, it is difficult to prioritize working on optimizing existing workloads. Too often, management only values delivering new workloads, while improving existing ones is just as important.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "In the KPIs for your teams or cost-driving units, include the desired amount of resource efficiency average % to make sure this stays on the agenda of your teams."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don’t yet put regular, planned effort into rightsizing your AWS resources, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Rightsizing is very similar to the classical principle of paying down technical debt, as it helps you free up resources financially to deliver new workloads. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q6",
+          "title": "Is there a mechanism in place to evaluate and optimize data-related costs?",
+          "description": "While AWS provides many options for optimizing Compute components of your architecture, data storage, transfer and networking are also important parts of your solution. Make sure the whole stack of your solution is optimized in terms of cost.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "A decision tree exists for data storage strategy based on the data type, including data retention, backup plan, etc.",
+              "helpfulResource": {
+                "displayText": "While data lakes and warehouses are increasingly becoming the norm in larger organizations, we usually see a lack of strategy in how to choose the storage component of a solution.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "The specifics of how, why and what in terms of storage for an AWS cloud solution should be clear and documented for each workload. This way you have a clear set of directions on which to base your cost optimization efforts."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Intelligent Tiering is used or at least considered for all AWS S3 based workloads.",
+              "helpfulResource": {
+                "displayText": "AWS Intelligent Tiering is an automated mechanism that helps you choose the right storage class for your workloads. As it is easy to activate, it is something that should be considered or in place for all of your S3-based workloads.",
+                "url": "https://aws.amazon.com/s3/storage-classes/intelligent-tiering/"
+              },
+              "improvementPlan": {
+                "displayText": "Identify some proof of concept S3 buckets where you can deploy and monitor the effectiveness of intelligent tiering. If the outcomes are desirable, consider expanding to the rest of your S3-based storage layer."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Data transfer and networking solutions are documented and optimized for cost efficiency.",
+                "helpfulResource": {
+                  "displayText": "While there are numerous options to optimize your compute usage and a lot of possibilities to save money on storage, the data transfer and networking components should not be forgotten. While the gains are marginal, data transfer costs can also be the most volatile type.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "While computing and storage optimization should be a priority, work on growing a list of best practices and lessons learned for your data transfer and networking components. Set a target of cost percentage that is desireable for transfer and networking costs (eg. 15% of the total workload cost). "
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Automation is deployed to eliminate orphaned EBS volumes and clean up unnecessary snapshots.",
+                "helpfulResource": {
+                  "displayText": "One of the easiest ways to incur costs in AWS is to leave unnecessary and unattached EBS volumes floating around. Deleting/terminating an instance does not kill the volume of the data it held and costs will remain until that is taken care of.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work with a cloud engineer to automate EBS volume identification and elimination. Sometimes this can be done through third-party tooling or you can build it yourself with Lambda and Cloudwatch.",
+                  "url" : "https://cloud.netapp.com/blog/automate-ebs-volumes-cost-efficiency"
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Data transfer and storage costs are part of the reported cloud costs and play a role in evaluating highly available solutions.",
+                "helpfulResource": {
+                  "displayText": "Sometimes people overlook non-compute-based costs when evaluating complex cloud set-ups. As the only right metric to evaluate costs against is business value, it is a good idea to set the business value of high available, multi-region set-ups against the costs of deploying it in such a manner.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "The goal here is to document your decision so the application or workload does not get listed up as ‘expensive’ without immediately linking to its high-available or multi-region profile. When identifying optimization targets, you want to have the right information available as soon as possible."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have only focused on optimizing your compute layer, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "While the biggest gains are usually in the compute layer of your application, storage should not be forgotten. Data grows and grows but hardly ever drastically drops, making it a cost that needs discipline and control over time. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q7",
+          "title": "Is the AWS Marketplace leveraged to optimize license agreements for external solutions?",
+          "description": "Not only can AWS Marketplace costs count towards enterprise discount agreements, but it is also often possible to receive discounts when purchasing external solutions via the AWS Marketplace. It also helps you centralize all your cloud-related costs in one place.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "The AWS Marketplace is considered as a purchasing platform when looking at new SaaS vendors or products.",
+              "helpfulResource": {
+                "displayText": "Leveraging the AWS Marketplace to manage your licensing allows you to centralize your cloud-related costs in one place and can often help you meet certain discount requirements.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Identify current SaaS or PaaS such as security monitoring or performance monitoring that you might be procuring outside of AWS and see if you can do a proof-of-concept to work with the AWS Marketplace."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "The AWS Account Manager or Reseller supports you in optimizing licensing agreements via the AWS Marketplace.",
+              "helpfulResource": {
+                "displayText": "Your AWS Partner can usually help you achieve discounts or other cost-optimal opportunities via the AWS Marketplace. ",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Identify software that you currently could see in scope for the AWS Marketplace. Work with your partner to see what the opportunities are for optimization there."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "A process is in place for procurement to assess offers via the AWS Marketplace.",
+                "helpfulResource": {
+                  "displayText": "The biggest challenge organizations face today when acquiring a lot of cloud-related technology is that their procurement department does not have a procurement process in place for this.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Adopting the cloud is as much about adapting business & procurement processes as it is about technological innovation. See if you can provide some introductory training to your procurement colleagues and provide them with a SPOC for cloud-related questions. A Cloud Financial Management Analyst or Engineer is usually a good choice for this."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "There is sufficient knowledge sharing between the IT Teams and procurement in the function of existing external solutions.",
+                "helpfulResource": {
+                  "displayText": "While knowledge sharing between IT and procurement is crucial in a good Cloud Financial Management practice in general, it is important that the IT teams are aware of existing license agreements and that procurement knows about possible improvements scoped out by the IT team.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Set up a recurring meeting between IT and procurement to discuss licenses and contracts in place for things like threat protection, security monitoring, health & uptime monitoring, and others. This way improvements can be aligned quickly, as situational awareness is kept up-to-date."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "The AWS Marketplace is used to discover new opportunities to improve our AWS-based solutions and activities.",
+                "helpfulResource": {
+                  "displayText": "The AWS Marketplace, like any marketplace, can be browsed when you are looking to solve a problem. While you should always work with your compliance and security department, try to visit it when you have need of a solution and see what the opportunities are.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "When looking to solve a problem or implement a new solution in your cloud environment, see if the AWS Marketplace has a service or product in place that meets your cloud security and compliance standards."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have not used the AWS Marketplace in your organization, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Not only services used to build workloads are in scope for Cloud Financial Management. SaaS and Commercial-of-the-shelf solutions are also part of your cloud landscape. Leveraging the AWS Marketplace can help you centralize your cloud-related procurement activities. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "finops_csp",
+      "name": "Cloud Spend Planning",
+      "questions": [
+        {
+          "id": "finops_csp_q1",
+          "title": "Do you have a mechanism in place to forecast the cost of existing cloud workloads?",
+          "description": "While you can always use historical data to try to predict the cost of cloud workloads that you already run, it is good to look beyond that and evaluate the possible cost drivers and what they will look like in your forecasting window.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Historical cost data is available to the stakeholders doing cloud forecasting exercises.",
+              "helpfulResource": {
+                "displayText": "Historical cost data of the cloud can help you identify periodic variations and expect cost growth. This forms a solid basis to look ahead.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Make sure historical data can be accessed and queried by the parties involved in doing the assessment. This can be done via third-party tooling, native AWS dashboarding or other methods."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Accuracy evaluations and reports of previous cloud cost forecasts are made available.",
+              "helpfulResource": {
+                "displayText": "It is always good to learn from previous forecasting efforts and see how you can improve the accuracy of those estimations going forward.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Even if they are ballpark estimates done by upper management, look at previously expected cloud costs and how they align with reality. Draw up the main reasons why these forecasts turned out right or inaccurate."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Forecasted revenue data is available for cloud-based workloads to offset the costs.",
+                "helpfulResource": {
+                  "displayText": "No cost is meaningful unless compared to the business value it returns. When looking at forecasted costs, be sure to also look at forecasted revenue and see if any red flags become immediately visible.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Forecasted revenue data should be made available to the stakeholders doing the cost forecasting. If this is not possible, offset the forecasted costs against the projected budget."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Forecasting is a collaboration of business and technology stakeholders.",
+                "helpfulResource": {
+                  "displayText": "The whole idea behind any Ops (DevOps, SecOps, FinOps, …) is that they break the traditional barriers between departments. For cloud costs, forecasting is a joint effort between business and technology stakeholders.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Create ambassador roles for each department that can foster communication and make sure the right people have the right information. "
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Forecasting is done on a monthly, quarterly or half-yearly basis.",
+                "helpfulResource": {
+                  "displayText": "While forecasting usually follows a yearly cadence, this is tough to use with cloud costs. Costs are charged on an hourly basis for most cloud services, which requires a more frequent evaluation and prognosis going forward.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work with your finance and management teams to see what cadence for forecasting is feasible for your organization. Try to increase it from just once a year, as this is too far removed from the cost cadence of cloud resources. Include forecasting variance in these exercises."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have a forecasting strategy in your organization for AWS workloads, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Forecasting is crucial in making your cloud predictable and keeping away the impression that cloud spending can not be controlled. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_csp_q2",
+          "title": "Do you have a mechanism in place to measure delivered business value?",
+          "description": "Cloud solutions can only be measured against meaningful business value data. For evaluating the costs of a cloud solution, you need to be able to measure and report on the business value of your solution.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "An evaluation process exists to measure the business value of your AWS workloads.",
+              "helpfulResource": {
+                "displayText": "While it can be hard to measure business value, a set of metrics can always be found to see if an application is really meaningful in your AWS landscape.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work on gathering business value metrics for your existing AWS workloads. Start with cost savings, operational resilience, usage data and requirement compatibility."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "The business value of an existing solution is compared with the business requirements.",
+              "helpfulResource": {
+                "displayText": "A lot of the time, we see organizations work with a sort of sunken cost fallacy. they hold onto applications deployed earlier, while they may not provide optimal business value or meet the business requirements.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "For your high-cost applications, identify if the delivered business value still meets the business criteria. If this is not the case, you have a strong argument to take action."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "For new solutions, the business value is estimated during the design phase.",
+                "helpfulResource": {
+                  "displayText": "The business value can be used to prioritize work and help identify the priority of projects. When designing new workloads for AWS, just as you know what it will cost you need to know what it will bring in terms of business value.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Just as every project in design should have a cost estimate, try and draw up what the expected business value can be. If it is possible to deliver this in measurable metrics, if not: try to draw up how it will enable your stakeholders and meet business requirements."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "The business value of cloud-based workloads is available to the various stakeholders involved with the application.",
+                "helpfulResource": {
+                  "displayText": "Because everyone is involved in the costs of an application (users, builders, etc.), everyone should also be aware and kept up-to-date on the business value of the application. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work on creating a ranked list of workloads based on business value, to help your teams determine priorities."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Business value is used to determine the priority of new and existing cloud workloads.",
+                "helpfulResource": {
+                  "displayText": "A lot of managers and business stakeholders have the tendency to view their work or application as the most important. Therefore it is important to have business value as a priority metric, since it reflects the importance to the organization as a whole.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "List up priorities of workloads running in AWS based on business value. Build on that by offsetting the business value against the cost to determine where action needs to be taken first."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have not worked with offsetting business value versus the cost of your cloud workloads, choose this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "The only way to identify if the cloud cost of a workload is acceptable, is by evaluating it against the business value it brings to your organization. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_csp_q3",
+          "title": "Do you have a cloud spend planning and budgeting strategy?",
+          "description": "While forecasting is all about making an estimate of what you expect will happen, budget and spend planning are ways to make sure you adhere to your forecasted spend horizon. Your spend planning should indicate how you will grow or otherwise adapt your cloud spending, while budgeting gives teams the boundaries in which they can act to meet the forecasted spend.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Cloud spend planning and budgeting are available in time to support organization budget rounds.",
+              "helpfulResource": {
+                "displayText": "Spend planning should help your organization stay agile and in touch with the real-time organizational context. The cadence with which you draw up budgets and create cloud spend plans should reflect this.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "If your organization does yearly cloud budget rounds, start making sure resources are allocated in advance to prepare these numbers. By preparing for budget exercises, you increase the accuracy of your budgets and spend planning and make sure no under-pressure assumptions are made."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Cloud spend planning and budgeting is done per team or cost-driving unit, rather than for the whole organization.",
+              "helpfulResource": {
+                "displayText": "Too often we see cloud spend being a part of the IT budget, which results in no relation between the teams driving the costs and the department in charge of allocating the budget.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "See what cost-driving units there are in your organization. These can be departments, teams, or projects, … and work with them to deliver their own spend planning and budget. These together can then help you build a more accurate picture for the overall cloud spend."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Cloud spend planning and budgeting is done on an application or workload level.",
+                "helpfulResource": {
+                  "displayText": "If you can work towards having a spend plan and budget for your application or workload, you can very accurately prioritize, roadmap and assess your cloud cost growth in the next financial period.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "It helps if each project has a cost evolution plan at the delivery stage. This can be easily translated into a budget and a spend plan. Work with the application or product owner to see where they want to take their workload and what the financial impact will be in terms of cloud cost."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Cloud spend planning and budget information are made available to the teams driving the costs.",
+                "helpfulResource": {
+                  "displayText": "A budget is too often something that is only visible to middle or higher management. By giving the teams access to their available budget and the planned spend, they have another parameter to use to build their solutions. It becomes a part of their engineering work.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work on making budget available to the teams building and architecting cloud solutions and try to instill a culture of ownership of the budget as a team. "
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Cloud spend planning is done using historical spend data and budgets reflect lessons learned of previous budget rounds.",
+                "helpfulResource": {
+                  "displayText": "Assuming historical spend data is available in the necessary granularity, this data should be used to get an idea of the natural growth of the cost, the fluctuation in accordance with the time of the year, cost drivers, etc.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Use data from the last 12 months (or up to 12 months) to see what normal cost evolution looks like per workload. Then offset that against the expected business context for the next budget period."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have made no specific cloud-related changes to your budgeting and cloud spend planning, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "A lot of the time companies only implement the technical side of cloud computing, without taking into account that it also requires an organizational change. This shows heavily in budgeting and forecasting cadence. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_csp_q4",
+          "title": "Does your budgeting cadence reflect the needs of the new cloud environment?",
+          "description": "Cloud resources are charged in an hourly manner and changes can occur extremely quickly. The speed with which you need to address and assess future change needs to reflect this new cadence.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Cloud spend planning and forecasting is performed against a rolling time window measured in months.",
+              "helpfulResource": {
+                "displayText": "With a rolling time window, we mean a time block that is applied to a specific starting date. By doing your planning and forecasting based on a rolling time window, you make sure you stay relevant to the most recent data.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Determine a rolling time window that makes sense to you. It can be one month, two months, three months, and so on. Just make sure that the agreed-upon window gives you enough information to do forecasting against. This should then be documented per workload in the organization’s Knowledge Management System."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Possible spend variances are identified on a regular basis and communicated to the relevant stakeholders.",
+              "helpfulResource": {
+                "displayText": "In order to make frequent cadence work, you need to have feedback between the budget sessions. This feedback on possible spend variances can then be used to adjust your budget and spend planning. Without identifying and communicating variances, budget exercises stay purely theoretical.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Decide on which cadence you want to evaluate periodic reporting data against your budgeted data. If your budget cycle is quarterly, consider reviewing the reported data on a monthly basis. Then create a space to record variances and make sure this knowledge is available to the stakeholders doing the budget rounds."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Spend planning & budget-related work are taken into account when making PI or sprint planning.",
+                "helpfulResource": {
+                  "displayText": "What we see happen a lot is that engineering or FinOps teams are rushed to deliver reports, cost filters, queries, dashboards or any sort of information needed to do budget exercises. This leads to short-sighted data, stress and possibly reporting mistakes.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Incorporate data preparation for the budget exercises in the sprints or PI plannings that are close to the budget timing. Make sure the necessary resources are allocated to support the data ingestion and digestion of the cloud financial footprint."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Documentation, deliverables and lessons learned ofrom previous budget exercises are available to the teams involved.",
+                "helpfulResource": {
+                  "displayText": "Since a budget or spend planning is a recurring thing (at least recurring yearly in any organization), it is necessary to always look back and see what mistakes or inaccuracies were present. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Every budget exercise should start with a retrospective, that is then documented and made available on the Knowledge Management System. Recurring findings in the retrospective should then lead to actions (improving dashboarding, replacing monitoring tools, …)."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Budget & spend planning is an active collaboration between the various stakeholders of the cloud environment.",
+                "helpfulResource": {
+                  "displayText": "Too often, budgets are fashioned in a top-down manner. This is in direct opposition to the information, that always flows bottom up. The creation of a budget should be at the intersection where the financial data of the cloud infrastructure meets the financial data of the business goals.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Appoint a dedicated point of contact or ‘ambassador’ for each of the layers involved. This can be on the management level, but make sure that management represents the engineering teams accurately. "
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have made no changes to the cadence or recurrence of your budget and spend planning efforts, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "A lot of the time, companies only implement the technical side of cloud computing, without taking into account that it also requires a change to how you look ahead. Costs are incurred hourly, so only budgeting and planning spend on a yearly basis is simply inadequate. This shows heavily in budgeting and forecasting cadence. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_csp_q5",
+          "title": "Do you evaluate on-premises workloads and private cloud workloads in relation to your cloud financial management?",
+          "description": "Most organizations today run workloads not only in the cloud but also in private or rented data centers. We frequently see that workloads that used to run in private on-premise or cloud infrastructure are then identified to be moved to a public cloud solution. It is important that from the start, the financial side is part of the picture.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Cloud financial data and on-premise infrastructure financial data flow to the same system to bundle all financial planning data.",
+              "helpfulResource": {
+                "displayText": "Too often, what goes on in the cloud is a blind spot for the financial or procurement department. They see the total monthly bill, but they do not see what that cost relates to. It does not always flow into the same holistic overview of IT infrastructure costs, which makes it difficult to deal with.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Work with your financial team to make monthly cloud cost and usage data available to them alongside other IT infrastructure data. This does not have to be a full integration from the first time, but at least they should have a holistic view available to them."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "On-premise infrastructure that is end-of-life, is assessed for cloud migration in a timely manner.",
+              "helpfulResource": {
+                "displayText": "The biggest cost is incurred when on-premises infrastructure needs to suddenly be moved to the cloud. It takes meticulous planning to make sure that what is moved to the cloud leverages the necessary cloud advantages and is optimized in cost.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Assuming you do a yearly roadmap for your existing on-premise infrastructure, see what targets there can be to be moved to the cloud. If you have a FinOps Engineer available, ask them to do an assessment of what the cost would be and have them work with your engineering teams to evaluate the workload of the total operation. AWS often provides funding for these kinds of migrations as well."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Private cloud workloads are held to the same reporting standard as public cloud infrastructure when it comes to cost efficiency.",
+                "helpfulResource": {
+                  "displayText": "Too often we see AWS cloud under strict scrutiny, while a contract with a private data center is accepted as an existing fact. By evaluating resource efficiency against the cost of the private data center contract, you have a unit metric that you can compare to the public cloud.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work on gathering resource efficiency versus cost data for your private data center and evaluate that against the public cloud alternative. While private cloud data centers usually have binding contracts, it is good to build a case."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Applications moved from on-premise to the AWS cloud are optimized while they are moved, or remediated straight afterward.",
+                "helpfulResource": {
+                  "displayText": "We have seen organizations offload the exact same application they had on-premise on an EC2 server in AWS. Little did they know a container-friendly version was available, which could have saved them a lot of money.  When migrating, you should always strive to improve in the process.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "When designing the to-be set-up of your migration workload, consider upgrading the application during the migration or straight after when things have stabilized. If an application seems to be not ready to be deployed in the cloud, consider replacing it with a SaaS or cloud-friendly alternative."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Lift-and-shift set-ups receive priority in cost optimization efforts.",
+                "helpfulResource": {
+                  "displayText": "Lift-and-shift setups are the big drainer in terms of cloud costs. They are built with the mindset of infrastructure owned, not infrastructure used. If your organization has these types of set-ups still, these are your prime targets for cost optimization.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Work on listing up the existing lift-and-shift applications running in AWS and determine if you will Retire, Replace or Rebuild them. Then you can use that list to roadmap the actions in sprints and work with your engineering resources to carry out the work."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If so far you have no comparison interaction between cloud cost and on-premise cost, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "On-premise systems are inherently linked to your cloud systems and can be compared efficiently in costs and cost efficiency. By incorporating your existing on-premise and private cloud in the conversation about cloud cost, you strive for a holistic view and enable roadmapping your cloud spend in a more accurate way. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "finops_om",
+      "name": "Operational Management",
+      "questions": [
+        {
+          "id": "finops_om_q1",
+          "title": "Do you have a dedicated resource to maintain FinOps governance?",
+          "description": "It is all well and good to have a set of standards worked out and policies set up, but you need to actively allocate resources to followup and maintain the strategy that you have in place. This is where a FinOps Engineer or Analyst comes in.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Someone is dedicated and responsible for cloud financial showback.",
+              "helpfulResource": {
+                "displayText": "One of the most barebones necessities to keep control of your cloud spend is awareness. Having someone who is in charge of performing showback in your organization is the first thing you will need in terms of dedicated resources.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Look at how you structure your reporting pipeline and showback model. Maybe your organization has a system of product owners, to which a FinOps Analyst can then report on a regular basis."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Centralized FinOps tasks are assigned to an insourced or outsourced resource.",
+              "helpfulResource": {
+                "displayText": "While showback is an important piece to the puzzle, there are a lot of other recurring tasks that need to happen. For this, it is necessary that an insourced or outsourced resource is available to work on this on a dedicated basis. Examples of tasks are: Evaluating cost efficiency, knowledge sharing, cost-anomaly monitoring, and response, …",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "If there are resources to free up an internal existing FTE, that is great. Their knowledge of the landscape comes in very handy. Alternatively, work on identifying a key engineer, team lead, architect, or other IT professional that can adopt the necessary tasks."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "The workload and expectations for FinOps capabilities match the allocated human resources.",
+                "helpfulResource": {
+                  "displayText": "One of the common complaints we see is that organizations that already do FinOps, usually pile the workload on top of already busy schedules of existing resources. Only when the allocated human resources match the requirements, will you be effective in your FinOps governance.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "If you already have a FinOps resource in place, sit down with them and assess the workload they currently have to see if it matches the available time they have. Adjust accordingly. If you plan to work with an external resource, you can work with us to assess your needs and match them to an FTE metric."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "The dedicated resource is sufficiently sponsored from up the chain of command.",
+                "helpfulResource": {
+                  "displayText": "FinOps challenges not only existing ways of working, but also future and past. Moreover, it challenges people’s decisions and prioritizations. This always needs the right backing from upper management, to ensure feedback and policies are adhered to as they should.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Identify a chain of command for decisions for each cost-driving unit and work on familiarizing them with the ‘why’ of FinOps. Identify your main sponsors and how FinOps goals align with the targets and KPIs of the other business departments."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Decentralized FinOps responsibilities are supported through a centralized FinOps capability. ",
+                "helpfulResource": {
+                  "displayText": "FinOps operates from a shared responsibility model. This means that a centralized part of the organization is responsible for the cost efficiency of the cloud, while the separate teams are responsible for the cost efficiency in the cloud. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Implement the FinOps Shared Responsibility Model in your organization and make sure that the responsibilities of each side are clear and available to your teams.",
+                  "url": "https://finopsalliance.com/blog/finops-shared-responsibility-model/"
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don't yet have a resource in place to do cloud financial operations, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Investing in FinOps frees up capital to invest in other things and helps your organization adopt the cloud as a whole instead of just the technical side. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_om_q2",
+          "title": "Is cloud financial management a shared responsibility in your organization?",
+          "description": "The cloud and cloud adoption is too often seen as just a technological implementation. For it to be effective and cost-efficient, it is imperative to have a business partnership between business, finance and technology stakeholders. They share the responsibility for cost efficiency.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "There exists a strategic partnership between finance, business and technology stakeholders about cloud usage.",
+              "helpfulResource": {
+                "displayText": "Cloud usage is a concern to all parties involved in using the cloud, but it should also be a catalyst for collaboration and partnership. It should be understood in the organization that cloud usage is not only the responsibility of one department.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "A partnership needs identifiable champions or ambassadors. Work on identifying key stakeholders of each involved party and set out the structure for how you want them to collaborate. This can be a workgroup, a dedicated team, …"
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Finance & Procurement collaborate with the Technology department to work out upfront AWS expenditures.",
+              "helpfulResource": {
+                "displayText": "Making upfront purchases for AWS is a complex business, it requires a lot of cloud usage technical data, insight into the available financials to make upfront commitments and the business case justifying the commitment.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Make a clear list of what you need to know to build a case for upfront purchase. With this, define who should provide what information. Finance can provide the upfront capital ability, business can provide the business case and technology can provide the usage metrics. Then the FinOps specialist can make the necessary recommendations. "
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Technology stakeholders are aware of cloud budgets and financial goals on various levels of the organization.",
+                "helpfulResource": {
+                  "displayText": "Finance and Procurement often have budgetary targets they need to achieve, that with cloud usage tend to be in the hands of cost-driving engineering teams. By helping technology teams understand the why of cost control measures, you promote a culture of ownership.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Identify a stakeholder from the finance team to create a briefing of the related financial goals about IT run or operational costs. Make sure the cost-driving teams understand and support the why of cost-controlling measures."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "AWS contract negotiations are done by a coalition of various stakeholder departments.",
+                "helpfulResource": {
+                  "displayText": "AWS contracts such as reselling agreements, managed service agreements, enterprise agreements, etc. are something that have an impact on both the technology teams and the procurement and finance colleagues. It stands to reason that they collaborate on the creation of those contracts.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "See what agreements your organization has in place and make sure that key stakeholders of each involved department is aware of the agreements. Making sure the existing contracts can be consulted by them is a good place to start."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "Each involved stakeholder party has a clear understanding of the angle of interest of the other parties.",
+                "helpfulResource": {
+                  "displayText": "Too often we see one organization and many different missions. By explaining the targets and points of importance to each other, different departments can make sure that they understand and support each other’s mission.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Start by having the key stakeholders of the involved departments deliver a mission statement or view statement about what cloud financial management means for them and why it is important. Bundle these statements and make them available in the FinOps knowledge space. These will be the backbone for the role each department plays in the overal operational management of your cloud finances."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don't feel as if your cloud financial operations are a partnership between various departments, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "As explained in our shared responsibility model, Cloud Financial Management is something that should be shared in your organization as a whole. Only by involving the other departments in a strong partnership, can you be truly effective. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_om_q3",
+          "title": "Is Cloud Financial Management managed in a programmatic way?",
+          "description": "By managing FinOps or CFM as a program, you ensure there are active best practices carried out in a reactive and proactive way. FinOps is a daily operational program that is managed and improved. A program involves planning, roadmap development, prioritization, milestones, etc.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "There is a defined FinOps program active in the organization.",
+              "helpfulResource": {
+                "displayText": "Different than a FinOps project, a program is a continuous set of activities surrounding cloud financial management in your organization.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "If there is no defined FinOps program active in the organization, there are a few things you should do. If there are ongoing FinOps initiatives, see how you can bundle those into one and form a program out of it. If FinOps is a green field to you, the action points from this tool will form the basis to get started."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "The FinOps program includes proactive cloud financial management measures.",
+              "helpfulResource": {
+                "displayText": "Part of doing a daily operational finops program is being proactive in your cost control. If your FinOps program is only reactive, you will always act to reduce waste only. ",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Proactive actions are fueled by historical data, roadmaps, forecasts, and business cases. Proactive measures are mainly categorized in rate optimization and governance policies (tagging strategy and enforcement, awareness creation, knowledge sharing, design, and built management). See which of these your organization needs and how you can implement them."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "The FinOps program includes proactive and reactive cloud financial management measures.",
+                "helpfulResource": {
+                  "displayText": "Reactive measures are usually how FinOps projects start in an organization. They arise from the need to respond to an increasing cost. Proactivity then helps that reactive project to grow into a program. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Reactive actions are fueled by monitoring, alerting and automation. Make sure you have proper monitoring and alerting in place to support reactive action and that there is a clear Service Agreement in place on how the reactive actions should be taken. Reactive actions should include rightsizing, clean-up, anomaly response and others."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Project or Program management resources are available to the FinOps team.",
+                "helpfulResource": {
+                  "displayText": "For any project or program to succeed in an organization, it needs proper management. PMs can help the FinOps team develop and deliver planning, roadmaps, policies, targets, assignments, operational planning etc.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Identify a project manager, program manager, project coordinator or team lead to help with the management of the FinOps efforts. The engineers and analysts assigned to FinOps capabilities should be able to focus on the implementation of cloud financial management best practices and not on the overhead management."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "The FinOps program has its own set of targets and KPIs to assess and improve its performance.",
+                "helpfulResource": {
+                  "displayText": "Just like any initiative, a FinOps program needs targets and KPIs to help it maintain course and have measurable results. ",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "A FinOps Program needs goals, targets and KPIs to measure and evaluate its impact. Start by implementing some KPIs around reporting, monitoring, alerting, reserved capacity utilization, etc.",
+                  "url": "https://github.com/finopsfoundation/kpis"
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": " If you don't yet have a FinOps program in place, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "While it is not easy to start and complete a successful FinOps project, a FinOps program can be even more challenging. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_co_q4",
+          "title": "Are there governance policies and measures in place to support FinOps?",
+          "description": "FinOps can be a very process-filled practice, but in the background it depends heavily on governance policies and automation. Services such as AWS Config, AWS Control Tower and third-party tools are necessary to enforce the standards FinOps needs to be effective.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Governance policy compliance checks happen in an automated and systematic way.",
+              "helpfulResource": {
+                "displayText": "Policies should be written up based on the desired outcome, but enforcing them by discipline only gets you so far. The more complex your organization becomes, the bigger the need for automated governance policy compliance measures.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "See if there are tools already in place that help you monitor compliance with policies. Work with your Quality, Operational Control, or Compliance department on this. Third-party tools can help you set up best practice checks and automate monitoring of them. In AWS some tools are also available natively. "
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Governance policies and measures are continuously reviewed and kept up to date with relevant changes.",
+              "helpfulResource": {
+                "displayText": "For the most part, this pertains to changes and lessons learned coming out of governance measures themselves. Governance policies and (automated) measures to enforce them will only become obsolete if left with management.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Plan in a review of the guard rails and service control policies, third-party controls and others you have in place on a quarterly or half-yearly basis. This should be part of the workload for a dedicated FinOps engineer, but alternatively it can be taken up by a governance or compliance team if they have sufficient affinity with AWS."
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "Non-compliant resources or situations are escalated to the necessary stakeholders in a standardized way.",
+                "helpfulResource": {
+                  "displayText": "Often we see organizations finding untagged or poorly tagged resources, and bring this to the attention of the resource owner via an e-mail or a conversation in the office. While this is great, having a ticket or standard procedure often ensures the non-compliant resources are not forgotten about and action can be followed up.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Discuss internally what reasonable actions should be taken for possible non-compliant resources. How long after alerting a stakeholder of a faulty tag, can you wait until repercussions? If an EBS volume or EC2 instance has an outdated type (t2 vs t3 or gp2 vs gp3), how long until actions will be taken? Standardize the action plan and make this available."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Actions against non-compliant resources receive sufficient leadership sponsoring.",
+                "helpfulResource": {
+                  "displayText": "The biggest cause for non-compliance is often the need to go fast. While this might save time in the short term, it will cost more time and effort when things need to be brought back in line. Leadership sponsoring non-compliance alerts and subsequent actions is crucial to make sure actions get taken.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Identify a chain of command for non-compliance tickets and make sure you know who to involve when a non-compliant resource is made. Should this be a team lead or management-level compliance stakeholder, a technology manager, or someone else?"
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "The importance of governance and policy compliance is championed by upper management.",
+                "helpfulResource": {
+                  "displayText": "Leading by example and explaining the why are very important here. Adhering to policy and governance strategy requires discipline. Discipline is in return supported by clear leadership and prioritization.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Only by making sure that there is an organization-wide strategy for FinOps governance and that this is stressed as an important point, can it succeed. In the end, it is about standardization and data quality. Identify the appropriate champions or stakeholders on the upper management level and set up a recurring review with them. This can be quarterly for example."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don't yet have a set of (automated) policies and measures in place about Cloud Financial Management, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "While you may have policies or part of your cloud strategy formalized that interact with cloud financial management principles, it is crucial to manage, automate and monitor their effectiveness. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        },
+        {
+          "id": "finops_om_q5",
+          "title": "Is FinOps promoted as a culture in the organization with transparent results?",
+          "description": "A final part of good Cloud Financial Operations is to show the organization which results are achieved. Showing the savings gained, optimizations achieved, capital freed, new dashboarding developed, etc. Showing positive results, but also being transparent about challenges faced helps build a larger culture of cloud financial management in the organization.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Expected FinOps business value is expressed in targets and set against the cost of the FinOps efforts.",
+              "helpfulResource": {
+                "displayText": "As FinOps is all about bringing balance to the cost paid over the business value gained, this applies also to the larger FinOps program. In order to measure its effectiveness, the value gained needs to be offset against the cost.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Start by identifying the cost of the FinOps program and offset it against the potential value. If you have it available, work with existing savings data and resource efficiency metrics. By comparing those, you will be able to work out the return on investment on your FinOps efforts."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "The finance and procurement departments are supported in understanding and working with AWS.",
+              "helpfulResource": {
+                "displayText": "The cloud requires everyone that comes into touch with it to have a grasp of certain basic concepts. As the party to bridge the gap between different departments, FinOps is well placed to facilitate this knowledge sharing.",
+                "url": "https://docs.aws.amazon.com/"
+              },
+              "improvementPlan": {
+                "displayText": "Organize brown bags for the finance department to get to know AWS and make training available to key stakeholders. The more they understand the way AWS works, the better the cloud behavior can align with the larger organization.",
+                "url": "https://aws.amazon.com/training/classroom/aws-cloud-for-finance-professionals/"
+              }
+            },
+            {
+                "id": "choice3",
+                "title": "There is an established channel to share FinOps-related achievements and news.",
+                "helpfulResource": {
+                  "displayText": "If no one hears the tree fall in the forest, did it really fall? While that is not the exact wording of that famous saying, it is very important to make the FinOps efforts in your organization known.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Start by setting up an internal newsletter or monthly brownbag that can be used to share FinOps related projects going on in the company. Promote teams to bring their own pieces of content and promote good behavior. Take it as an opportunity to show what you have done and keep people on board."
+                }
+              },
+              {
+                "id": "choice4",
+                "title": "Efforts are made to build cohesion between the various stakeholders involved in FinOps.",
+                "helpfulResource": {
+                  "displayText": "While most organizations might not have a whole team of FinOps engineers at their disposal, they do have numerous stakeholders that play a crucial role in the FinOps program. Making sure that they feel cohesion is very important to make your mission effective.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Identify the key stakeholders involved in each department and organize a brainstorming session, lunch meeting, off-site or other creative space to bring their ideas and concerns together and create the atmosphere of a theme around the subject of cloud financial management."
+                }
+              },
+              {
+                "id": "choice5",
+                "title": "FinOps engineers and analysts are supported in engaging with the larger FinOps community.",
+                "helpfulResource": {
+                  "displayText": "FinOps is a growing practice and much can be learned through the larger FinOps community. By supporting your inhouse resource to engage with that community, you help them stay on top of recent developments, which benefits your organization.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Sit down with your in-house FinOps resources and discuss with them how and if they would like to participate in the larger FinOps community. This can be through meet-ups, events, community work… When there is a misalignment in desire and possibility, be sure to explain this thoroughly and look for a solution or alternative together."
+                }
+              },
+              {
+                "id": "choice6",
+                "title": "None of the above apply to us.",
+                "helpfulResource": {
+                  "displayText": "If you don't yet have a way to nurture a FinOps culture in your entire organization, select this option.",
+                  "url": "https://docs.aws.amazon.com/"
+                },
+                "improvementPlan": {
+                  "displayText": "Implementing FinOps is all about breaking down the barriers between different departments. This requires a cultural exchange and maturing process with regard to the cloud. Work on implementing the other action points of this topic."
+                }
+              }
+          ],
+          "riskRules": [
+            { "condition": "choice1 && choice2 && choice3 && choice4 && choice4 && choice5", "risk": "NO_RISK" },
+            { "condition": "(choice1 || choice2) && ((choice3 && choice4) || (choice3 && choice5) || (choice4 && choice5)) && !choice6", "risk": "MEDIUM_RISK" },
+            { "condition": "default", "risk": "HIGH_RISK" }
+          ]
+        }
+      ]
+    }
+  ]
+}
